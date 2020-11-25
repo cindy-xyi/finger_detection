@@ -12,6 +12,9 @@ def binarize(im, threshold=50, kernel=np.ones((4,4)), display=False):
     output: 
         im: binarize image
     '''
+    
+    # Filter out extreme levels of noise
+    im[im>5000] = 0
     im = im/im.max() * 255
     im = im.astype(np.uint8)
     im[im > 50] = 0

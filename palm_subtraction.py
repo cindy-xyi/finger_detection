@@ -17,13 +17,26 @@ def clean_image(depth_img):
 
     # Erode to get rid of noise
     kernel = np.ones((10, 5))
-    experiment = cv2.erode(bin_img, kernel)
+    bin_img = cv2.erode(bin_img, kernel)
 
     # Ignore bottom few rows
     bin_img[220:, :] = 0
 
     # Median filter to get rid of some more noise.
     bin_img = ndimage.median_filter(bin_img, size=10)
+
+    _, lab_im = cv2.connectedComponents(bin_img)
+
+
+    # find areas and subtract it
+    max_area = -1
+    max_label = -1
+    for label in range(1, np.max(np.unique(lab_im))+1):
+        area = np.sum((lab_im == label).astype('uint8'))
+        if area > max_area:
+            max_area = area
+            max_label = label
+    bin_img = (lab_im == max_label).astype('uint8') * 255
 
     return bin_img
 
@@ -52,7 +65,8 @@ def main(argv):
 
     # Read in images
     print(os.getcwd())
-    img = cv2.imread(f'./{data_dir}/{img_num}-color.png', cv2.IMREAD_COLOR)
+    print(f'{data_dir}/{img_num}-color.png')
+    img = cv2.imread(f'{data_dir}/{img_num}-color.png', cv2.IMREAD_COLOR)
     # gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     depth_img = util.read_depth_map(f'./{data_dir}/{img_num}-depth.bin')
 
