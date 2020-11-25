@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from scipy import ndimage
 import util
 import os
+import p1n2 as hw
 
 def clean_image(depth_img):
 
@@ -37,7 +38,7 @@ def clean_image(depth_img):
             max_area = area
             max_label = label
     bin_img = (lab_im == max_label).astype('uint8') * 255
-
+    
     return bin_img
 
 
@@ -52,6 +53,19 @@ def palm_subtraction(bin_img):
     kernel = cv2.circle(kernel, (20, 20), 20, (255, 255, 255), -1)
     image_dilate = cv2.dilate(image_erode, kernel[:, :, 1])
 
+    attribute_list = hw.get_attribute(image_dilate/255)
+    h, w = image_dilate.shape
+    radius = 25
+
+    y = np.arange(int(attribute_list[0]['position']['x']), h)
+    b = attribute_list[0]['position']['y'] - np.tan(attribute_list[0]['orientation'])*attribute_list[0]['position']['x']
+    m = np.tan(attribute_list[0]['orientation'])
+
+    for (yi) in zip(y):
+        x_calc = int(np.round((yi - b)/ min(-m, m)))
+        # image_dilate[yi, x_calc - radius : x_calc + radius] = 255
+        image_dilate[yi, 0 : x_calc + radius] = 255
+    
     # Subtract palm from hand to get fingers
     fingies = bin_img - image_dilate
     fingies[fingies != 255] = 0
