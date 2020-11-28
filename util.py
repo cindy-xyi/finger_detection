@@ -20,8 +20,10 @@ def binarize(im, threshold=50, kernel=np.ones((4,4)), display=False):
     im[im > 50] = 0
     im = cv2.erode(im, kernel)
     im = cv2.dilate(im, kernel)
+    im[im != 0] = 255
     
     if display is True:
+        print("disp true")
         plt.imshow(im)
         plt.colorbar()
         plt.show()
