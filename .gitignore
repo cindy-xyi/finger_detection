@@ -1,6 +1,5 @@
 data/
 .ipynb_checkpoints/
-__pycache__/
 *.pth
 neural_network/JessicaCindy/.ipynb_checkpoints/
 neural_network/JessicaCindy/saved_models/
